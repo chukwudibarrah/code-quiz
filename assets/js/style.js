@@ -7,7 +7,7 @@
 
 startButton.addEventListener("click", countDown)
 startButton.addEventListener('click', startGame)
-nextButton.addEventListener('click', function() {
-    currentQuestionIndex++;
-    setNextQuestion();
-  })
+// nextButton.addEventListener('click', function() {
+//     currentQuestionIndex++;
+//     setNextQuestion();
+//   })

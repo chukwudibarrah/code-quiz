@@ -5,6 +5,7 @@ var startButton = document.getElementById("start");
 var finalScore = document.querySelector("#final-score");
 var nextButton = document.getElementById("btn");
 var userInitials = document.querySelector("#initials");
+var listItem = document.querySelector("#listItem");
 var questionSection = document.querySelector("#questions");
 var questionTitle = document.getElementById("question-title");
 var choices = document.getElementById("choices");
@@ -47,14 +48,15 @@ var shuffledQuestions, currentQuestionIndex;
 // }
 
 function countDown() {
-    var timeLeft = 40;
+    var timeLeft = 20;
     var timeInterval = setInterval(function () {
     if (timeLeft > 1) {
     timer.textContent = "Time: " + timeLeft;
     
     timeLeft--;
     } else if (timeLeft === 1) {
-    timer.textContent = 'Your time is up!';
+      gameOver();
+    // timer.textContent = 'Your time is up!';
     
     clearInterval(timeInterval);
     }
@@ -64,13 +66,14 @@ function countDown() {
 function startGame() {
     startScreen.classList.add("hide");
     questionSection.classList.remove("hide");
-    console.log("startGame: " + questions);
+    // console.log("startGame: " + questions);
     shuffledQuestions = questions.sort(() => Math.random() - .5);
     currentQuestionIndex = 0;
     setNextQuestion();
 }
 
 function setNextQuestion() {
+    resetState();
     showQuestion(shuffledQuestions[currentQuestionIndex])
 }
 
@@ -78,37 +81,69 @@ function showQuestion(question) {
     questionTitle.innerText = question.question;
     console.log("question.question: " + question.question);
     question.choices.forEach(answer => {
+        
+        choices.innerHTML = "";
         var li = document.createElement("li");
         li.innerText = answer.text;
-        li.classList.add("listItem");
-        if (answer.correct) {
-            li.dataset.correct = answer.correct
-        }
-        li.addEventListener("click", selectAnswer);
+        console.log(answer.text);
         listChoices.appendChild(li);
+
+        // li.innerText = answer.text;
+        // console.log(li.innerText);
+        // li.classList.add("listItem");
+        // listChoices.appendChild(li);
+
+    // li.addEventListener('click', function() {
+    //   currentQuestionIndex++;
+    //   setNextQuestion();
+    //   resetState();
+    // })
+    //     if (answer.correct) {
+    //         li.dataset.correct = answer.correct;
+    //         var theWin = document.createElement('p');
+    //         theWin.innerHTML = "Correct!";
+    //         choices.appendChild(theWin) 
+    //     } else {
+    //       var notWin = document.createElement('p');
+    //         notWin.innerHTML = "Wrong!";
+    //         choices.appendChild(notWin)
+    //     }
+
+        li.addEventListener("click", selectAnswer);
     })
+}
+
+function gameOver() {
+  questionSection.classList.add('hide');
+  var h2 = document.createElement('h2');
+  h2.innerHTML = "Game over! See the high scores or try again.";
+  document.body.appendChild(h2);
 }
 
 function resetState() {
     clearStatusClass(document.body)
-    nextButton.classList.add('hide')
     while (choices.firstChild) {
       choices.removeChild(choices.firstChild)
     }
   }
 
-  function selectAnswer(e) {
-    var selectedButton = e.target
-    var correct = selectedButton.dataset.correct
-    setStatusClass(document.body, correct)
+  function selectAnswer(event) {
+    var selectedButton = event.target
+    var correct = selectedButton.dataset.correct;
+    setStatusClass(document.body, correct);
     Array.from(choices.children).forEach(li => {
       setStatusClass(li, li.dataset.correct)
-    })
+    });
+
+    // li.addEventListener('click', function() {
+      currentQuestionIndex++;
+      setNextQuestion();
+      resetState();
+
     if (shuffledQuestions.length > currentQuestionIndex + 1) {
-      nextButton.classList.remove('hide')
+      choices.classList.remove('hide')
     } else {
-      startButton.innerText = 'Restart'
-      startButton.classList.remove('hide')
+      gameOver();
     }
   }
 
@@ -116,6 +151,7 @@ function resetState() {
     clearStatusClass(element)
     if (correct) {
       element.classList.add('correct')
+      li.dataset.correct = answer.correct;
     } else {
       element.classList.add('wrong')
     }
